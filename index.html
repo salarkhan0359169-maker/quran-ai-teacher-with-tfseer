@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quran AI Teacher</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f7f5;
+            color: #17231d;
+        }
+
+        /* LANGUAGE SCREEN */
+
+        .language-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background: linear-gradient(
+                135deg,
+                #f3f7f5,
+                #e4f0eb
+            );
+        }
+
+        .language-box {
+            width: 100%;
+            max-width: 720px;
+            background: white;
+            padding: 55px 45px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            color: #126b4f;
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .logo span {
+            color: #d39b35;
+        }
+
+        .book-icon {
+            width: 80px;
+            height: 80px;
+            margin: auto;
+            margin-bottom: 22px;
+            border-radius: 50%;
+            background: #e3f1eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        h1 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #68746e;
+            margin-bottom: 35px;
+            line-height: 1.7;
+        }
+
+        .select-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .languages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .language-btn {
+            border: 2px solid #e3ebe7;
+            background: #f8faf9;
+            border-radius: 18px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .language-btn:hover {
+            border-color: #126b4f;
+            background: #e3f1eb;
+            transform: translateY(-5px);
+        }
+
+        .flag {
+            font-size: 35px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .language-btn strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .language-btn small {
+            color: #68746e;
+        }
+
+        .note {
+            margin-top: 25px;
+            color: #89938d;
+            font-size: 13px;
+        }
+
+        @media(max-width:650px) {
+
+            .language-box {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+
+            .languages {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="language-screen">
+
+        <div class="language-box">
+
+            <div class="logo">
+                Quran <span>AI</span>
+            </div>
+
+            <div class="book-icon">
+                📖
+            </div>
+
+            <h1>
+                Welcome to Quran AI Teacher
+            </h1>
+
+            <p class="subtitle">
+                Choose your preferred language to start
+                your Quran learning journey.
+            </p>
+
+            <div class="select-title">
+                Select Language
+            </div>
+
+
+            <div class="languages">
+
+
+                <button
+                    class="language-btn"
+                    onclick="selectLanguage('ur')"
+                >
+
+                    <span class="flag">
+                        🇵🇰
+                    </span>
+
+                    <strong>
+                        اردو
+                    </strong>
+
+                    <small>
+                        Urdu
+                    </small>
+
+                </button>
+
+
+                <button
+                    class="language-btn"
+                    onclick="selectLanguage('en')"
+                >
+
+                    <span class="flag">
+                        🇬🇧
+                    </span>
+
+                    <strong>
+                        English
+                    </strong>
+
+                    <small>
+                        English
+                    </small>
+
+                </button>
+
+
+                <button
+                    class="language-btn"
+                    onclick="selectLanguage('ar')"
+                >
+
+                    <span class="flag">
+                        🇸🇦
+                    </span>
+
+                    <strong>
+                        العربية
+                    </strong>
+
+                    <small>
+                        Arabic
+                    </small>
+
+                </button>
+
+
+            </div>
+
+
+            <div class="note">
+                Your language preference will be saved.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function selectLanguage(language) {
+
+            localStorage.setItem(
+                "selectedLanguage",
+                language
+            );
+
+            window.location.href =
+                "learning.html";
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

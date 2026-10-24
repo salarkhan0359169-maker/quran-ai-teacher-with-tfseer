@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quran AI Teacher</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#17352d;min-height:100vh}
+header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:18px 35px;background:#fff;border-bottom:1px solid #dce8e3;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.logo{font-size:24px;font-weight:bold;color:#126b4f}
+.home-btn,.back-btn{text-decoration:none;color:#fff;background:#126b4f;border:1px solid #126b4f;padding:10px 18px;border-radius:25px;cursor:pointer}
+.home-btn:hover,.back-btn:hover{background:#0d543e}
+.main-container{width:95%;max-width:1450px;margin:30px auto}
+.page-title{text-align:center;margin-bottom:30px}
+.page-title h1{color:#126b4f;font-size:38px;margin-bottom:8px}
+.page-title p{color:#52645e}
+.learning-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:25px}
+.panel{background:#fff;border:1px solid #dce8e3;border-radius:20px;padding:22px;box-shadow:0 15px 50px rgba(0,0,0,.08);min-width:0}
+.panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.panel-title h2{color:#126b4f}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+select,input,button,textarea{font-family:inherit}
+select,input,textarea{width:100%;min-width:0;padding:12px;border-radius:10px;border:1px solid #b9d2c8;background:#fff;color:#17352d;outline:none}
+select:focus,input:focus,textarea:focus{border-color:#126b4f;box-shadow:0 0 0 3px rgba(18,107,79,.1)}
+button{border:none;padding:12px 18px;border-radius:10px;cursor:pointer;font-weight:bold;transition:.2s}
+button:disabled{opacity:.6;cursor:not-allowed}
+.primary-btn{background:#126b4f;color:#fff}
+.primary-btn:hover{background:#0d543e}
+.secondary-btn{background:#198754;color:#fff}
+.danger-btn{background:#2f7d62;color:#fff}
+.quran-area{max-height:650px;overflow-y:auto;padding-right:5px}
+.quran-area::-webkit-scrollbar,.tafseer-container::-webkit-scrollbar,.chat-messages::-webkit-scrollbar{width:7px}
+.quran-area::-webkit-scrollbar-thumb,.tafseer-container::-webkit-scrollbar-thumb,.chat-messages::-webkit-scrollbar-thumb{background:#126b4f;border-radius:10px}
+.ayah-card{padding:20px;margin-bottom:14px;border-radius:15px;background:#fbfdfc;border:1px solid #e0ebe6}
+.ayah-card.active{border-color:#126b4f;box-shadow:0 0 20px rgba(18,107,79,.13)}
+.ayah-number{color:#126b4f;font-size:13px;margin-bottom:10px;font-weight:bold}
+.arabic-text{direction:rtl;text-align:right;font-size:34px;line-height:2.5;margin-bottom:14px;font-family:"Amiri","Noto Naskh Arabic","Scheherazade New","Traditional Arabic","Times New Roman",serif}
+.translation-text{color:#3e514a;line-height:1.9;font-size:18px;padding-top:12px;border-top:1px solid #e5eee9}
+.translation-text.rtl{direction:rtl;text-align:right;font-family:Arial,"Noto Nastaliq Urdu","Noto Naskh Arabic",sans-serif}
+.translation-text.ltr{direction:ltr;text-align:left}
+.bismillah-card{padding:20px;margin-bottom:18px;border-radius:15px;background:#f3faf7;border:1px solid #cfe4da}
+.bismillah-title{color:#126b4f;font-weight:bold;font-size:14px;margin-bottom:12px}
+.bismillah-arabic{direction:rtl;text-align:center;font-size:30px;line-height:2.3;margin-bottom:12px;font-family:"Amiri","Noto Naskh Arabic","Traditional Arabic",serif}
+.bismillah-translation{border-top:1px solid #dbeae4;padding-top:12px;color:#3e514a;font-size:17px;line-height:1.9}
+.bismillah-translation.rtl{direction:rtl;text-align:right}
+.status{padding:10px 14px;border-radius:10px;background:#eef8f4;color:#126b4f;margin-bottom:15px;font-size:14px;border:1px solid #d5eae2}
+.teacher-section{display:flex;flex-direction:column;align-items:center}
+.teacher-image-box{width:100%;max-width:430px;height:480px;border-radius:22px;overflow:hidden;background:#eef5f2;border:1px solid #cfe2da}
+.teacher-image{width:100%;height:100%;object-fit:cover;display:block}
+.teacher-status{margin-top:15px;color:#126b4f;font-weight:bold;text-align:center;line-height:1.7}
+.teacher-message{width:100%;margin-top:15px;padding:15px;min-height:80px;border-radius:14px;background:#f7faf8;border:1px solid #dfeae5;line-height:1.7;color:#263d35;overflow-wrap:anywhere;white-space:pre-wrap}
+.teacher-message.rtl{direction:rtl;text-align:right}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:25px;margin-bottom:15px}
+.tab-btn{background:#eaf4f0;color:#126b4f;border:1px solid #cfe2da}
+.tab-btn.active{background:#126b4f;color:#fff}
+.tab-content{display:none;padding:18px;background:#fff;border:1px solid #dfeae5;border-radius:15px;line-height:1.8;color:#334b43}
+.tab-content.active{display:block}
+.tafseer-container{max-height:700px;overflow-y:auto;padding-right:8px}
+.tafseer-source{padding:12px 15px;margin-bottom:15px;background:#eef8f4;border:1px solid #d5eae2;border-radius:10px;color:#126b4f;font-weight:bold}
+.tafseer-item{padding:20px;margin-bottom:15px;border:1px solid #dfeae5;border-radius:15px;background:#fbfdfc;scroll-margin-top:100px}
+.tafseer-item-title{color:#126b4f;font-weight:bold;font-size:15px;margin-bottom:12px}
+.tafseer-text{color:#334b43;line-height:2;font-size:17px;overflow-wrap:anywhere}
+.tafseer-text.rtl{direction:rtl;text-align:right;font-family:Arial,"Noto Nastaliq Urdu","Noto Naskh Arabic",sans-serif}
+.tafseer-text.ltr{direction:ltr;text-align:left}
+.tafseer-warning{padding:12px 15px;margin-bottom:15px;background:#fff8e8;border:1px solid #f0dfb2;border-radius:10px;color:#76591c;line-height:1.8}
+.tafseer-page{display:none}
+.tafseer-page.active{display:block}
+.tafseer-search-panel{background:#fff;border:1px solid #dce8e3;border-radius:20px;padding:24px;box-shadow:0 15px 50px rgba(0,0,0,.07);margin-bottom:22px}
+.search-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.search-box{padding:18px;border:1px solid #dfeae5;background:#fbfdfc;border-radius:15px}
+.search-box h3{color:#126b4f;margin-bottom:8px}
+.search-box p{color:#61736c;font-size:14px;line-height:1.7;margin-bottom:14px}
+.search-row{display:flex;gap:10px;align-items:stretch}
+.search-row input{flex:1;min-width:0}
+.search-row button{white-space:nowrap}
+.search-results{margin-top:20px}
+.search-help{font-size:13px;color:#61736c;line-height:1.7;margin-top:10px}
+.hidden{display:none!important}
+footer{text-align:center;color:#6f827b;padding:35px 15px}
+
+/* AI CHAT DASHBOARD */
+.ai-chat-panel{margin-top:0;display:flex;flex-direction:column;min-height:0}
+.ai-chat-intro{color:#61736c;line-height:1.8;margin-bottom:18px}
+.chat-messages{height:340px;max-height:55vh;overflow-y:auto;border:1px solid #dce8e3;border-radius:14px;background:#f8fbf9;padding:15px;margin-bottom:15px}
+.chat-empty{text-align:center;color:#72857d;padding:35px 10px;line-height:1.8}
+.chat-message{max-width:90%;padding:13px 15px;margin-bottom:12px;border-radius:14px;line-height:1.8;overflow-wrap:anywhere;white-space:pre-wrap}
+.chat-message.user{margin-left:auto;background:#dff5e6;color:#174e35;border:1px solid #c5e9d2;border-bottom-right-radius:4px}
+.chat-message.ai{margin-right:auto;background:#fff;color:#17352d;border:1px solid #dce8e3;border-bottom-left-radius:4px}
+.chat-message.system{max-width:100%;margin:8px auto;text-align:center;background:#eef8f4;color:#527066;font-size:13px}
+.chat-role{display:block;font-size:12px;font-weight:bold;margin-bottom:5px;color:#126b4f}
+.chat-input-area{display:flex;gap:10px;align-items:stretch}
+.chat-input-area textarea{flex:1;resize:vertical;min-height:50px;max-height:140px;line-height:1.6}
+.chat-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mic-btn{background:#e7f5ee;color:#126b4f;border:1px solid #b9d9ca}
+.mic-btn.listening{background:#b42318;color:#fff;animation:pulse 1.2s infinite}
+.chat-status{font-size:13px;color:#61736c;margin-top:12px;line-height:1.7;min-height:20px}
+.chat-language-note{font-size:12px;color:#708179;margin-top:10px;line-height:1.7}
+@keyframes pulse{50%{opacity:.65}}
+@media(max-width:1000px){.learning-grid{grid-template-columns:1fr}.teacher-image-box{height:500px}.search-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+ header{padding:15px;gap:10px}.logo{font-size:19px}.main-container{width:94%}
+ .page-title h1{font-size:28px}.arabic-text{font-size:27px;line-height:2.4}
+ .bismillah-arabic{font-size:25px}.teacher-image-box{height:420px}
+ .search-row{flex-direction:column}.search-row button{width:100%}
+ .panel,.tafseer-search-panel{padding:15px}.chat-input-area{flex-direction:column}
+ .chat-input-area button{width:100%}.chat-message{max-width:100%}
+}
+</style>
+</head>
+
+<body>
+<header>
+    <div class="logo" id="logoText">Quran AI Teacher</div>
+    <div style="display:flex;gap:10px;align-items:center">
+        <button id="backToLearningBtn" class="back-btn hidden" type="button">← Back to Learning</button>
+        <a href="index.html" class="home-btn" id="homeBtn">Home</a>
+    </div>
+</header>
+
+<main id="learningPage">
+<div class="main-container">
+    <div class="page-title">
+        <h1 id="pageTitle">Quran Learning</h1>
+        <p id="pageSubtitle">Learn Quran with your AI Teacher</p>
+    </div>
+
+    <div class="learning-grid">
+        <section class="panel">
+            <div class="panel-title"><h2 id="quranHeading">📖 Quran</h2></div>
+            <div class="controls">
+                <select id="surahSelect">
+                    <option value="">Loading Surahs...</option>
+                </select>
+            </div>
+            <div id="quranStatus" class="status">Ready</div>
+            <div id="quranArea" class="quran-area"></div>
+            <div class="controls" style="margin-top:18px">
+                <button class="primary-btn" id="listenBtn" type="button">▶ Listen</button>
+                <button class="danger-btn" id="stopBtn" type="button">■ Stop</button>
+            </div>
+        </section>
+
+        <!-- AI CHAT DASHBOARD (replaces the teacher image panel) -->
+        <section class="panel ai-chat-panel" id="aiChatPanel">
+            <div class="panel-title">
+                <h2 id="chatHeading">💬 Ask Your Quran AI Teacher</h2>
+            </div>
+            <p class="ai-chat-intro" id="chatIntro">
+                Type your question or use the microphone. Your speech will appear as text, and the AI answer will be shown as text only.
+            </p>
+
+            <div class="chat-messages" id="chatMessages" aria-live="polite">
+                <div class="chat-empty" id="chatEmpty">
+                    Assalam-o-Alaikum! Ask a question about the Quran, translation, or Tafseer.
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <textarea id="chatInput" rows="2" placeholder="Type your question here..."></textarea>
+                <button class="primary-btn" id="sendChatBtn" type="button">Send</button>
+            </div>
+
+            <div class="chat-actions">
+                <button class="mic-btn" id="micBtn" type="button">🎙 Start Speaking</button>
+                <button class="danger-btn" id="clearChatBtn" type="button">Clear Chat</button>
+            </div>
+
+            <div class="chat-status" id="chatStatus" role="status"></div>
+            <div class="chat-language-note" id="chatLanguageNote">
+                Replies are text-only. Voice input requires a browser that supports speech recognition.
+            </div>
+            <!-- Hidden compatibility elements used by existing language/status logic. -->
+            <div class="hidden" id="teacherStatus">Teacher is ready</div>
+            <div class="hidden" id="teacherMessage">Assalam-o-Alaikum! Welcome to Quran Learning.</div>
+        </section>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="quranTab" id="quranTabBtn" type="button">📖 Quran</button>
+        <button class="tab-btn" data-tab="translationTab" id="translationTabBtn" type="button">🌐 Translation</button>
+        <button class="tab-btn" data-tab="tafseerTab" id="tafseerTabBtn" type="button">📚 Tafseer</button>
+    </div>
+
+    <div id="quranTab" class="tab-content active">
+        <h3 id="quranTabTitle">Quran</h3>
+        <p id="quranTabText">Select a Surah and listen to Quran recitation with Al-Afasy.</p>
+    </div>
+
+    <div id="translationTab" class="tab-content">
+        <h3 id="translationTabTitle">Translation</h3>
+        <p id="translationInfo">Quran translation will appear according to the selected language.</p>
+    </div>
+</div>
+</main>
+
+<main id="tafseerPage" class="tafseer-page">
+<div class="main-container">
+    <div class="page-title">
+        <h1 id="tafseerPageTitle">Quran Tafseer</h1>
+        <p id="tafseerPageSubtitle">Search Tafseer by Surah or Ayah number</p>
+    </div>
+
+    <section class="tafseer-search-panel">
+        <div class="search-grid">
+            <div class="search-box">
+                <h3 id="surahSearchHeading">📚 Surah Tafseer</h3>
+                <p id="surahSearchDescription">Search for a Surah, then select it from the dropdown to load its available Tafseer.</p>
+                <input id="surahSearchInput" type="search" placeholder="Search Surah name..." autocomplete="off">
+                <div style="height:10px"></div>
+                <select id="tafseerSurahSelect">
+                    <option value="">Loading Surahs...</option>
+                </select>
+                <div style="height:12px"></div>
+                <button class="primary-btn" id="loadSurahTafseerBtn" type="button">Show Surah Tafseer</button>
+            </div>
+
+            <div class="search-box">
+                <h3 id="ayahSearchHeading">🔎 Ayah Tafseer</h3>
+                <p id="ayahSearchDescription">Select a Surah on the left, enter an Ayah number, and search for its Tafseer.</p>
+                <div class="search-row">
+                    <input id="ayahSearchInput" type="number" min="1" placeholder="Enter Ayah number">
+                    <button class="primary-btn" id="searchAyahTafseerBtn" type="button">Search Ayah</button>
+                </div>
+                <div id="ayahSearchHelp" class="search-help">Choose a Surah first. The allowed Ayah number depends on the selected Surah.</div>
+            </div>
+        </div>
+    </section>
+
+    <div id="tafseerSearchStatus" class="status">Select a Surah to begin.</div>
+    <section id="tafseerSearchResults" class="tafseer-container search-results"></section>
+</div>
+</main>
+
+<footer id="footerText">Quran AI Teacher © 2026</footer>
+
+<script>
+"use strict";
+
+/* API SETTINGS */
+const API = "https://api.alquran.cloud/v1";
+const TAFSEER_API = "https://alfurqan.online/api/v1/tafseer";
+const URDU_TAFSEER_API = "https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir/ur-tafseer-ibn-e-kaseer";
+const URDU_TAFSEER_BACKUP_API = "https://raw.githubusercontent.com/spa5k/tafsir_api/main/tafsir/ur-tafseer-ibn-e-kaseer";
+
+/*
+ IMPORTANT:
+ This is the n8n production webhook used for the Quran AI Teacher.
+ If your active webhook is different, replace this URL.
+*/
+const AI_WEBHOOK_URL = "https://wolf166600.app.n8n.cloud/webhook/quran-ai-voice-teacher";
+
+/* LANGUAGE */
+let selectedLanguage = localStorage.getItem("selectedLanguage") || "ur";
+if (!["ur", "en", "ar"].includes(selectedLanguage)) selectedLanguage = "ur";
+
+let surahs = [];
+let currentSurah = null;
+let currentTranslation = [];
+let bismillahTranslation = "";
+let currentAyahIndex = 0;
+let playbackRunId = 0;
+let tafseerCache = new Map();
+let currentTafseerItems = [];
+let currentTafseerSource = "";
+
+/* CHAT STATE */
+let chatHistory = [];
+let isSendingMessage = false;
+let speechRecognition = null;
+let isListening = false;
+let conversationId = makeConversationId();
+
+function makeConversationId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+    }
+    return "quran-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10);
+}
+
+const $ = id => document.getElementById(id);
+const surahSelect = $("surahSelect");
+const quranArea = $("quranArea");
+const quranStatus = $("quranStatus");
+const teacherStatus = $("teacherStatus");
+const teacherMessage = $("teacherMessage");
+const tafseerSurahSelect = $("tafseerSurahSelect");
+const tafseerSearchResults = $("tafseerSearchResults");
+const tafseerSearchStatus = $("tafseerSearchStatus");
+
+/* LANGUAGE HELPERS */
+function teacherText(ur, en, ar) {
+    if (selectedLanguage === "ur") return ur;
+    if (selectedLanguage === "ar") return ar;
+    return en;
+}
+
+function setTeacherStatus(message) {
+    teacherStatus.textContent = message;
+}
+
+function setTeacherMessage(message) {
+    teacherMessage.textContent = message;
+    teacherMessage.classList.toggle("rtl", selectedLanguage !== "en");
+}
+
+/* LANGUAGE UI */
+function updateLanguageUI() {
+    const ur = selectedLanguage === "ur";
+    const ar = selectedLanguage === "ar";
+
+    const text = {
+        logoText: ur ? "قرآن اے آئی استاد" : ar ? "معلم القرآن بالذكاء الاصطناعي" : "Quran AI Teacher",
+        homeBtn: ur ? "ہوم" : ar ? "الرئيسية" : "Home",
+        pageTitle: ur ? "قرآن سیکھیں" : ar ? "تعلم القرآن" : "Quran Learning",
+        pageSubtitle: ur ? "اپنے اے آئی استاد کے ساتھ قرآن سیکھیں" : ar ? "تعلم القرآن مع معلمك بالذكاء الاصطناعي" : "Learn Quran with your AI Teacher",
+        quranHeading: ur ? "📖 قرآن" : ar ? "📖 القرآن" : "📖 Quran",
+        teacherHeading: ur ? "👩‍🏫 اے آئی استاد" : ar ? "👩‍🏫 معلم الذكاء الاصطناعي" : "👩‍🏫 AI Teacher",
+        listenBtn: ur ? "▶ سنیں" : ar ? "▶ استماع" : "▶ Listen",
+        stopBtn: ur ? "■ روکیں" : ar ? "■ إيقاف" : "■ Stop",
+        quranTabBtn: ur ? "📖 قرآن" : ar ? "📖 القرآن" : "📖 Quran",
+        translationTabBtn: ur ? "🌐 ترجمہ" : ar ? "🌐 الترجمة" : "🌐 Translation",
+        tafseerTabBtn: ur ? "📚 تفسیر" : ar ? "📚 التفسير" : "📚 Tafseer",
+        quranTabTitle: ur ? "قرآن" : ar ? "القرآن" : "Quran",
+        quranTabText: ur ? "سورہ منتخب کریں اور العفاسی کی آواز میں قرآن کی تلاوت سنیں۔" : ar ? "اختر سورة واستمع إلى تلاوة القرآن بصوت العفاسي." : "Select a Surah and listen to Quran recitation with Al-Afasy.",
+        translationTabTitle: ur ? "ترجمہ" : ar ? "الترجمة" : "Translation",
+        translationInfo: ur ? "قرآن کی آیات کے نیچے اردو ترجمہ دکھایا جائے گا۔" : ar ? "سيظهر نص القرآن باللغة العربية مع الترجمة المتاحة." : "Quran ayahs will appear with the available English translation.",
+        footerText: ur ? "قرآن اے آئی استاد © 2026" : ar ? "معلم القرآن بالذكاء الاصطناعي © 2026" : "Quran AI Teacher © 2026"
+    };
+
+    Object.entries(text).forEach(([id, value]) => {
+        if ($(id)) $(id).textContent = value;
+    });
+
+    $("tafseerPageTitle").textContent = ur ? "قرآن کی تفسیر" : ar ? "تفسير القرآن" : "Quran Tafseer";
+    $("tafseerPageSubtitle").textContent = ur ? "سورہ یا آیت نمبر کے ذریعے تفسیر تلاش کریں" : ar ? "ابحث عن التفسير بالسورة أو رقم الآية" : "Search Tafseer by Surah or Ayah number";
+    $("surahSearchHeading").textContent = ur ? "📚 سورہ کی تفسیر" : ar ? "📚 تفسير السورة" : "📚 Surah Tafseer";
+    $("surahSearchDescription").textContent = ur ? "سورہ تلاش کریں اور ڈراپ ڈاؤن سے منتخب کرکے اس کی دستیاب تفسیر دیکھیں۔" : ar ? "ابحث عن سورة واخترها لعرض التفسير المتاح." : "Search for a Surah, then select it from the dropdown to load its available Tafseer.";
+    $("ayahSearchHeading").textContent = ur ? "🔎 آیت کی تفسیر" : ar ? "🔎 تفسير الآية" : "🔎 Ayah Tafseer";
+    $("ayahSearchDescription").textContent = ur ? "سورہ منتخب کریں، آیت نمبر لکھیں اور اس کی تفسیر تلاش کریں۔" : ar ? "اختر سورة وأدخل رقم الآية للبحث عن تفسيرها." : "Select a Surah, enter an Ayah number, and search for its Tafseer.";
+    $("surahSearchInput").placeholder = ur ? "سورہ کا نام تلاش کریں" : ar ? "ابحث عن اسم السورة" : "Search Surah name...";
+    $("ayahSearchInput").placeholder = ur ? "آیت نمبر لکھیں" : ar ? "أدخل رقم الآية" : "Enter Ayah number";
+    $("loadSurahTafseerBtn").textContent = ur ? "سورہ کی تفسیر دکھائیں" : ar ? "عرض تفسير السورة" : "Show Surah Tafseer";
+    $("searchAyahTafseerBtn").textContent = ur ? "آیت تلاش کریں" : ar ? "ابحث عن الآية" : "Search Ayah";
+    $("backToLearningBtn").textContent = ur ? "← سیکھنے والے صفحے پر واپس" : ar ? "← العودة للتعلم" : "← Back to Learning";
+
+    $("chatHeading").textContent = ur ? "💬 اپنے قرآن اے آئی استاد سے سوال کریں" : ar ? "💬 اسأل معلم القرآن الذكي" : "💬 Ask Your Quran AI Teacher";
+    $("chatIntro").textContent = ur
+        ? "اپنا سوال لکھیں یا مائیکروفون استعمال کریں۔ آپ کی آواز متن میں تبدیل ہوگی اور اے آئی کا جواب صرف تحریری شکل میں ہوگا۔"
+        : ar
+        ? "اكتب سؤالك أو استخدم الميكروفون. سيتحول صوتك إلى نص وستظهر إجابة الذكاء الاصطناعي نصاً فقط."
+        : "Type your question or use the microphone. Your speech will appear as text, and the AI answer will be shown as text only.";
+    $("chatInput").placeholder = ur ? "اپنا سوال یہاں لکھیں..." : ar ? "اكتب سؤالك هنا..." : "Type your question here...";
+    $("sendChatBtn").textContent = ur ? "بھیجیں" : ar ? "إرسال" : "Send";
+    $("clearChatBtn").textContent = ur ? "چیٹ صاف کریں" : ar ? "مسح المحادثة" : "Clear Chat";
+    $("micBtn").textContent = isListening
+        ? (ur ? "■ سننا بند کریں" : ar ? "■ إيقاف الاستماع" : "■ Stop Listening")
+        : (ur ? "🎙 بولنا شروع کریں" : ar ? "🎙 ابدأ التحدث" : "🎙 Start Speaking");
+    $("chatLanguageNote").textContent = ur
+        ? "اے آئی کے جواب صرف تحریری ہوں گے۔ مائیکروفون کے لیے speech recognition کی حمایت کرنے والا براؤزر ضروری ہے۔"
+        : ar
+        ? "ستظهر إجابات الذكاء الاصطناعي نصياً فقط. يتطلب الميكروفون متصفحاً يدعم التعرف على الكلام."
+        : "AI replies are text-only. Voice input requires a browser that supports speech recognition.";
+
+    setTeacherStatus(ur ? "استاد تیار ہے" : ar ? "المعلم جاهز" : "Teacher is ready");
+    setTeacherMessage(ur
+        ? "السلام علیکم! قرآن سیکھنے میں خوش آمدید۔"
+        : ar
+        ? "السلام عليكم! أهلاً بك في تعلم القرآن."
+        : "Assalam-o-Alaikum! Welcome to Quran Learning.");
+
+    updateChatDirection();
+}
+
+function updateChatDirection() {
+    const rtl = selectedLanguage !== "en";
+    $("chatInput").dir = rtl ? "rtl" : "ltr";
+    $("chatMessages").dir = "ltr";
+    $("chatInput").style.textAlign = rtl ? "right" : "left";
+}
+/* TRANSLATION */
+function getTranslationEdition() {
+    if (selectedLanguage === "ur") return "ur.jalandhry";
+    if (selectedLanguage === "en") return "en.sahih";
+    return null;
+}
+
+/* LOAD SURAH LIST */
+async function loadSurahs() {
+    try {
+        const response = await fetch(`${API}/surah`);
+        if (!response.ok) throw new Error("Unable to load Surahs");
+
+        const json = await response.json();
+        surahs = json.data || [];
+
+        [surahSelect, tafseerSurahSelect].forEach(select => {
+            select.innerHTML = "";
+            surahs.forEach(surah => {
+                const option = document.createElement("option");
+                option.value = surah.number;
+                option.textContent = `${surah.number}. ${surah.englishName} — ${surah.name}`;
+                option.dataset.english = surah.englishName.toLowerCase();
+                option.dataset.arabic = surah.name;
+                select.appendChild(option);
+            });
+        });
+
+        if (surahs.length) {
+            surahSelect.value = "1";
+            tafseerSurahSelect.value = "1";
+            await loadSelectedSurah(1);
+            updateAyahSearchHelp();
+        }
+    } catch (error) {
+        console.error(error);
+        surahSelect.innerHTML = '<option value="">Unable to load Surahs</option>';
+        tafseerSurahSelect.innerHTML = '<option value="">Unable to load Surahs</option>';
+        quranStatus.textContent = teacherText(
+            "سورہ لوڈ نہیں ہو سکیں۔ انٹرنیٹ چیک کریں۔",
+            "Unable to load Surahs. Check your internet connection.",
+            "تعذر تحميل السور. تحقق من اتصال الإنترنت."
+        );
+    }
+}
+
+/* SURAH SEARCH FILTER */
+$("surahSearchInput").addEventListener("input", () => {
+    const query = $("surahSearchInput").value.trim().toLowerCase();
+
+    [...tafseerSurahSelect.options].forEach(option => {
+        if (!option.value) return;
+        const number = String(option.value);
+        const text = option.textContent.toLowerCase();
+        const arabic = option.dataset.arabic || "";
+        option.hidden = !!query && !text.includes(query) && !number.includes(query) && !arabic.includes(query);
+    });
+
+    const selected = tafseerSurahSelect.selectedOptions[0];
+    if (selected && selected.hidden) {
+        const first = [...tafseerSurahSelect.options].find(option => option.value && !option.hidden);
+        if (first) tafseerSurahSelect.value = first.value;
+    }
+    updateAyahSearchHelp();
+});
+
+function getSelectedTafseerSurah() {
+    return surahs.find(s => Number(s.number) === Number(tafseerSurahSelect.value)) || null;
+}
+
+tafseerSurahSelect.addEventListener("change", updateAyahSearchHelp);
+
+function updateAyahSearchHelp() {
+    const surah = getSelectedTafseerSurah();
+
+    if (!surah) {
+        $("ayahSearchHelp").textContent = "Choose a Surah first.";
+        $("ayahSearchInput").max = "";
+        return;
+    }
+
+    $("ayahSearchInput").max = String(surah.numberOfAyahs);
+    $("ayahSearchInput").placeholder = `1-${surah.numberOfAyahs}`;
+
+    $("ayahSearchHelp").textContent = selectedLanguage === "ur"
+        ? `منتخب سورہ ${surah.name} میں ${surah.numberOfAyahs} آیات ہیں۔ آیت نمبر 1 سے ${surah.numberOfAyahs} تک درج کریں۔`
+        : selectedLanguage === "ar"
+        ? `تحتوي سورة ${surah.name} على ${surah.numberOfAyahs} آية. أدخل رقماً من 1 إلى ${surah.numberOfAyahs}.`
+        : `${surah.englishName} contains ${surah.numberOfAyahs} ayahs. Enter a number from 1 to ${surah.numberOfAyahs}.`;
+}
+
+/* BISMILLAH TRANSLATION */
+async function loadBismillahTranslation() {
+    bismillahTranslation = "";
+    if (!currentSurah || Number(currentSurah.number) === 1) return;
+
+    const edition = getTranslationEdition();
+    if (!edition) return;
+
+    try {
+        const response = await fetch(`${API}/ayah/1/${edition}`);
+        if (!response.ok) throw new Error("Bismillah translation failed");
+        const data = await response.json();
+        bismillahTranslation = data?.data?.text || "";
+    } catch (error) {
+        console.warn(error);
+    }
+}
+
+function stripLeadingBismillah(text) {
+    if (!text) return text;
+    const source = String(text);
+    const firstFourWords = source.trim().split(/\s+/u).slice(0, 4);
+    if (firstFourWords.length < 4) return source;
+
+    const normalizeForBismillah = value => String(value)
+        .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+        .replace(/ٱ/g, "ا")
+        .replace(/[أإآ]/g, "ا")
+        .replace(/ـ/g, "")
+        .trim();
+
+    const normalized = firstFourWords.map(normalizeForBismillah).join(" ");
+    if (normalized !== "بسم الله الرحمن الرحيم") return source;
+
+    return source.trim().split(/\s+/u).slice(4).join(" ").trim();
+}
+
+/* LOAD QURAN SURAH */
+async function loadSelectedSurah(number) {
+    if (!number) return;
+
+    try {
+        quranStatus.textContent = teacherText("قرآن لوڈ ہو رہا ہے...", "Loading Quran...", "جارٍ تحميل القرآن...");
+
+        const response = await fetch(`${API}/surah/${number}/quran-uthmani`);
+        if (!response.ok) throw new Error("Quran loading failed");
+
+        const json = await response.json();
+        if (!json.data?.ayahs) throw new Error("Quran data missing");
+
+        currentSurah = json.data;
+        currentTranslation = [];
+
+        const edition = getTranslationEdition();
+        if (edition) {
+            try {
+                const translationResponse = await fetch(`${API}/surah/${number}/${edition}`);
+                if (translationResponse.ok) {
+                    const translationJson = await translationResponse.json();
+                    currentTranslation = translationJson.data?.ayahs || [];
+                }
+            } catch (error) {
+                console.warn("Translation loading error", error);
+            }
+        }
+
+        if (Number(currentSurah.number) !== 1 && Number(currentSurah.number) !== 9) {
+            if (currentSurah.ayahs.length) {
+                const firstAyah = currentSurah.ayahs[0];
+                firstAyah.text = stripLeadingBismillah(firstAyah.text);
+            }
+        }
+
+        await loadBismillahTranslation();
+        renderQuran();
+
+        quranStatus.textContent = selectedLanguage === "ur"
+            ? `${currentSurah.name} تیار ہے۔`
+            : selectedLanguage === "ar"
+            ? `${currentSurah.name} جاهزة.`
+            : `${currentSurah.englishName} is ready.`;
+
+        if ($("tafseerPage").classList.contains("active") && Number(tafseerSurahSelect.value) === Number(number)) {
+            updateAyahSearchHelp();
+        }
+    } catch (error) {
+        console.error(error);
+        quranStatus.textContent = teacherText("قرآن لوڈ نہیں ہو سکا۔", "Unable to load Quran.", "تعذر تحميل القرآن.");
+    }
+}
+
+surahSelect.addEventListener("change", async () => {
+    stopQuranAudio(false);
+    currentAyahIndex = 0;
+    await loadSelectedSurah(Number(surahSelect.value));
+});
+
+/* HTML ESCAPE */
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/* RENDER BISMILLAH */
+function renderBismillah() {
+    if (!currentSurah) return "";
+    if (Number(currentSurah.number) === 1 || Number(currentSurah.number) === 9) return "";
+
+    const rtl = selectedLanguage !== "en";
+    let translation = bismillahTranslation;
+
+    if (!translation) {
+        translation = selectedLanguage === "ur"
+            ? "اللہ کے نام سے جو نہایت مہربان، بے حد رحم فرمانے والا ہے۔"
+            : selectedLanguage === "ar"
+            ? "بسم الله الرحمن الرحيم"
+            : "In the name of Allah, the Most Gracious, the Most Merciful.";
+    }
+
+    return `<div class="bismillah-card">
+        <div class="bismillah-title">${selectedLanguage === "ur" ? "بسم اللہ الرحمن الرحیم" : selectedLanguage === "ar" ? "بسم الله الرحمن الرحيم" : "Bismillah"}</div>
+        <div class="bismillah-arabic" dir="rtl" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        <div class="bismillah-translation ${rtl ? "rtl" : "ltr"}">${escapeHtml(translation)}</div>
+    </div>`;
+}
+
+/* RENDER QURAN */
+function renderQuran() {
+    quranArea.innerHTML = "";
+    if (!currentSurah?.ayahs?.length) return;
+
+    quranArea.innerHTML = renderBismillah();
+
+    currentSurah.ayahs.forEach((ayah, index) => {
+        const card = document.createElement("div");
+        card.className = "ayah-card";
+        card.id = `ayah-${index}`;
+
+        const translation = currentTranslation[index]?.text || "";
+
+        card.innerHTML = `
+            <div class="ayah-number">${selectedLanguage === "ur" ? "آیت" : selectedLanguage === "ar" ? "الآية" : "Ayah"} ${index + 1}</div>
+            <div class="arabic-text" dir="rtl" lang="ar">${escapeHtml(ayah.text)}</div>
+            ${translation ? `<div class="translation-text ${selectedLanguage === "ur" ? "rtl" : "ltr"}">${escapeHtml(translation)}</div>` : ""}
+        `;
+        quranArea.appendChild(card);
+    });
+}
+
+/* CLEAN TAFSEER HTML */
+function cleanTafseerHTML(value) {
+    const temp = document.createElement("div");
+    temp.innerHTML = String(value || "");
+    temp.querySelectorAll("script,style,iframe,object,embed,form").forEach(el => el.remove());
+
+    temp.querySelectorAll("*").forEach(el => {
+        [...el.attributes].forEach(attr => {
+            if (attr.name.toLowerCase().startsWith("on")) el.removeAttribute(attr.name);
+        });
+    });
+    return temp.innerHTML;
+}
+
+/* GET TAFSEER ID */
+function getTafseerId() {
+    if (selectedLanguage === "en") return "ibn-kathir-english";
+    if (selectedLanguage === "ar") return "ibn-kathir";
+    return null;
+}
+
+/* FETCH TAFSEER */
+async function fetchTafseerFromSources(urls) {
+    let lastError;
+    for (const url of urls) {
+        try {
+            const response = await fetch(url, { cache: "no-cache" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!data || typeof data !== "object") throw new Error("Invalid Tafseer response");
+            return data;
+        } catch (error) {
+            lastError = error;
+            console.warn("Tafseer source failed:", url, error);
+        }
+    }
+    throw lastError || new Error("Tafseer unavailable");
+}
+
+/* LOAD SURAH TAFSEER */
+async function loadSurahTafseer(surahNumber) {
+    const surah = surahs.find(item => Number(item.number) === Number(surahNumber));
+    if (!surah) return;
+
+    tafseerSearchResults.innerHTML = "";
+    tafseerSearchStatus.textContent = selectedLanguage === "ur"
+        ? "تفسیر لوڈ ہو رہی ہے..."
+        : selectedLanguage === "ar" ? "جارٍ تحميل التفسير..." : "Loading Tafseer...";
+
+    const cacheKey = `${surahNumber}-${selectedLanguage}`;
+
+    try {
+        let data;
+        let sourceId;
+
+        if (tafseerCache.has(cacheKey)) {
+            data = tafseerCache.get(cacheKey).data;
+            sourceId = tafseerCache.get(cacheKey).sourceId;
+        } else if (selectedLanguage === "ur") {
+            const urls = [
+                `${URDU_TAFSEER_API}/${surahNumber}.json`,
+                `${URDU_TAFSEER_BACKUP_API}/${surahNumber}.json`
+            ];
+            data = await fetchTafseerFromSources(urls);
+            sourceId = "ur-tafseer-ibn-e-kaseer";
+            tafseerCache.set(cacheKey, { data, sourceId });
+        } else {
+            const tafseerId = getTafseerId();
+            const response = await fetch(`${TAFSEER_API}/${tafseerId}/surah/${surahNumber}`);
+            if (!response.ok) throw new Error(`Tafseer API HTTP ${response.status}`);
+            data = await response.json();
+            sourceId = tafseerId;
+            tafseerCache.set(cacheKey, { data, sourceId });
+        }
+
+        currentTafseerSource = sourceId;
+        currentTafseerItems = extractTafseerItems(data);
+        renderTafseerList(currentTafseerItems);
+
+        tafseerSearchStatus.textContent = selectedLanguage === "ur"
+            ? `${surah.name} کی دستیاب تفسیر دکھائی جا رہی ہے۔`
+            : selectedLanguage === "ar"
+            ? `تم تحميل التفسير المتاح لسورة ${surah.name}.`
+            : `${surah.englishName}: available Tafseer loaded.`;
+
+        if (!currentTafseerItems.length) {
+            tafseerSearchStatus.textContent = selectedLanguage === "ur"
+                ? "اس سورہ کے لیے API میں تفسیر کا قابلِ مطالعہ متن نہیں ملا۔"
+                : "No readable Tafseer entries were found for this Surah.";
+        }
+    } catch (error) {
+        console.error("Tafseer loading error:", error);
+
+        tafseerSearchStatus.textContent = selectedLanguage === "ur"
+            ? "تفسیر لوڈ نہیں ہو سکی۔ انٹرنیٹ چیک کرکے دوبارہ کوشش کریں۔"
+            : selectedLanguage === "ar"
+            ? "تعذر تحميل التفسير. حاول مرة أخرى."
+            : "Tafseer could not be loaded. Check your connection and try again.";
+
+        tafseerSearchResults.innerHTML = `
+            <div class="tafseer-item">
+                <div class="tafseer-item-title">${selectedLanguage === "ur" ? "تفسیر لوڈ نہیں ہوئی" : "Tafseer could not be loaded"}</div>
+                <button class="primary-btn" type="button" id="retryTafseerBtn">${selectedLanguage === "ur" ? "دوبارہ کوشش کریں" : "Retry"}</button>
+            </div>`;
+        $("retryTafseerBtn").addEventListener("click", () => loadSurahTafseer(surahNumber));
+    }
+}
+
+/* EXTRACT TAFSEER ITEMS */
+function extractTafseerItems(data) {
+    let items = [];
+
+    if (Array.isArray(data)) items = data;
+    else if (Array.isArray(data.ayahs)) items = data.ayahs;
+    else if (Array.isArray(data.tafseers)) items = data.tafseers;
+    else if (Array.isArray(data.tafsir)) items = data.tafsir;
+    else if (Array.isArray(data.verses)) items = data.verses;
+    else if (data.tafsir && Array.isArray(data.tafsir.ayahs)) items = data.tafsir.ayahs;
+
+    if (!items.length) {
+        const collected = [];
+        function walk(value) {
+            if (!value) return;
+            if (Array.isArray(value)) {
+                value.forEach(walk);
+                return;
+            }
+            if (typeof value !== "object") return;
+            const text = extractTafseerText(value);
+            if (text) {
+                collected.push(value);
+                return;
+            }
+            Object.values(value).forEach(walk);
+        }
+        walk(data);
+        items = collected;
+    }
+    return items;
+}
+
+function extractTafseerText(item) {
+    if (!item) return "";
+    if (typeof item === "string") return item;
+    if (typeof item.text === "string") return item.text;
+    if (typeof item.content === "string") return item.content;
+    if (typeof item.tafsirText === "string") return item.tafsirText;
+    if (typeof item.tafsir === "string") return item.tafsir;
+    if (item.tafsir && typeof item.tafsir.text === "string") return item.tafsir.text;
+    if (item.ayah && typeof item.ayah.tafsir === "string") return item.ayah.tafsir;
+    return "";
+}
+
+function extractAyahNumber(item, fallback) {
+    if (!item || typeof item !== "object") return fallback;
+
+    const candidates = [
+        item.ayah_number, item.ayahNumber, item.verse_number, item.verseNumber,
+        item.number, typeof item.ayah === "number" ? item.ayah : null,
+        item.ayah && item.ayah.number, item.verse && item.verse.number,
+        item.verse && item.verse.verse_number
+    ];
+
+    for (const candidate of candidates) {
+        if (candidate !== undefined && candidate !== null && candidate !== "" && Number.isFinite(Number(candidate))) {
+            return Number(candidate);
+        }
+    }
+    return fallback;
+}
+
+/* RENDER TAFSEER */
+function renderTafseerList(items) {
+    tafseerSearchResults.innerHTML = "";
+
+    const source = document.createElement("div");
+    source.className = "tafseer-source";
+    source.textContent = selectedLanguage === "ur"
+        ? "📚 تفسیر ابن کثیر — اردو"
+        : selectedLanguage === "ar" ? "📚 تفسير ابن كثير" : "📚 Tafsir Ibn Kathir";
+    tafseerSearchResults.appendChild(source);
+
+    if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "tafseer-item";
+        empty.textContent = selectedLanguage === "ur"
+            ? "اس سورہ کی تفسیر API کے جواب میں نہیں ملی۔"
+            : "No Tafseer entries were found in the API response.";
+        tafseerSearchResults.appendChild(empty);
+        return;
+    }
+
+    let shown = 0;
+    const seen = new Set();
+
+    items.forEach((item, index) => {
+        const text = extractTafseerText(item);
+        if (!text || !String(text).trim()) return;
+
+        const ayahNumber = extractAyahNumber(item, index + 1);
+        const key = `${ayahNumber}-${String(text).trim()}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+
+        const card = document.createElement("article");
+        card.className = "tafseer-item";
+        card.dataset.ayah = String(ayahNumber);
+
+        const title = document.createElement("div");
+        title.className = "tafseer-item-title";
+        title.textContent = selectedLanguage === "ur"
+            ? `آیت ${ayahNumber} کی تفسیر`
+            : selectedLanguage === "ar"
+            ? `تفسير الآية ${ayahNumber}`
+            : `Tafsir of Ayah ${ayahNumber}`;
+
+        const content = document.createElement("div");
+        content.className = `tafseer-text ${selectedLanguage === "en" ? "ltr" : "rtl"}`;
+        content.innerHTML = cleanTafseerHTML(text);
+
+        card.append(title, content);
+        tafseerSearchResults.appendChild(card);
+        shown++;
+    });
+
+    if (!shown) {
+        const empty = document.createElement("div");
+        empty.className = "tafseer-item";
+        empty.textContent = selectedLanguage === "ur" ? "تفسیر کا متن نہیں ملا۔" : "No Tafseer text was returned.";
+        tafseerSearchResults.appendChild(empty);
+    }
+}
+
+/* SEARCH AYAH TAFSEER */
+async function searchAyahTafseer() {
+    const surah = getSelectedTafseerSurah();
+    const input = $("ayahSearchInput");
+    const ayahNumber = Number(input.value);
+
+    if (!surah) {
+        tafseerSearchStatus.textContent = selectedLanguage === "ur" ? "پہلے سورہ منتخب کریں۔" : "Please select a Surah first.";
+        return;
+    }
+
+    if (!input.value.trim() || !Number.isInteger(ayahNumber) || ayahNumber < 1 || ayahNumber > surah.numberOfAyahs) {
+        tafseerSearchStatus.textContent = selectedLanguage === "ur"
+            ? `درست آیت نمبر درج کریں: 1 سے ${surah.numberOfAyahs} تک۔`
+            : `Enter a valid Ayah number from 1 to ${surah.numberOfAyahs}.`;
+        input.focus();
+        return;
+    }
+
+    await loadSurahTafseer(surah.number);
+
+    const allCards = [...tafseerSearchResults.querySelectorAll(".tafseer-item[data-ayah]")];
+    const matched = allCards.filter(card => Number(card.dataset.ayah) === ayahNumber);
+    allCards.forEach(card => card.classList.add("hidden"));
+
+    if (matched.length) {
+        matched.forEach(card => card.classList.remove("hidden"));
+        tafseerSearchStatus.textContent = selectedLanguage === "ur"
+            ? `${surah.name} — آیت ${ayahNumber} کی تفسیر`
+            : `${surah.englishName} — Tafseer of Ayah ${ayahNumber}`;
+        matched[0].scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+        tafseerSearchStatus.textContent = selectedLanguage === "ur"
+            ? `آیت ${ayahNumber} کی الگ تفسیر API میں نہیں ملی۔`
+            : `A separate Tafseer entry for Ayah ${ayahNumber} was not found in this API.`;
+
+        const notice = document.createElement("div");
+        notice.className = "tafseer-warning";
+        notice.textContent = selectedLanguage === "ur"
+            ? "تفسیر کے ڈیٹا میں ہر آیت کا الگ ریکارڈ ہونا ضروری نہیں۔ مکمل سورہ کی دستیاب تفسیر دیکھنے کے لیے اوپر والا بٹن استعمال کریں۔"
+            : "Tafseer datasets do not always have one separate record per Ayah. Use the Surah Tafseer button to view all available commentary.";
+        tafseerSearchResults.prepend(notice);
+    }
+}
+
+$("loadSurahTafseerBtn").addEventListener("click", async () => {
+    const surah = getSelectedTafseerSurah();
+    if (!surah) return;
+    $("ayahSearchInput").value = "";
+    await loadSurahTafseer(surah.number);
+});
+
+$("searchAyahTafseerBtn").addEventListener("click", searchAyahTafseer);
+$("ayahSearchInput").addEventListener("keydown", event => {
+    if (event.key === "Enter") searchAyahTafseer();
+});
+
+/* PAGE NAVIGATION */
+function openTafseerPage() {
+    stopQuranAudio(false);
+    $("learningPage").classList.add("hidden");
+    $("tafseerPage").classList.add("active");
+    $("backToLearningBtn").classList.remove("hidden");
+
+    document.querySelectorAll(".tab-btn").forEach(button => button.classList.remove("active"));
+    $("tafseerTabBtn").classList.add("active");
+
+    if (surahSelect.value) tafseerSurahSelect.value = surahSelect.value;
+
+    updateAyahSearchHelp();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    loadSurahTafseer(Number(tafseerSurahSelect.value) || 1);
+}
+
+function backToLearning() {
+    $("tafseerPage").classList.remove("active");
+    $("learningPage").classList.remove("hidden");
+    $("backToLearningBtn").classList.add("hidden");
+
+    $("tafseerTabBtn").classList.remove("active");
+    $("quranTabBtn").classList.add("active");
+
+    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+    $("quranTab").classList.add("active");
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+$("backToLearningBtn").addEventListener("click", backToLearning);
+
+/* QURAN AUDIO — AL-AFASY */
+function playAudio(url, runId) {
+    return new Promise(resolve => {
+        const audio = new Audio(url);
+        window.currentQuranAudio = audio;
+        let done = false;
+
+        const finish = () => {
+            if (done) return;
+            done = true;
+            resolve();
+        };
+
+        audio.onended = finish;
+        audio.onerror = finish;
+
+        if (runId !== playbackRunId) {
+            finish();
+            return;
+        }
+
+        audio.play().catch(error => {
+            console.error(error);
+            finish();
+        });
+    });
+}
+
+async function playSurah() {
+    if (!currentSurah?.ayahs?.length) return;
+
+    stopQuranAudio(false);
+    const runId = ++playbackRunId;
+
+    quranStatus.textContent = teacherText(
+        "قرآن کی تلاوت شروع ہو گئی ہے",
+        "Quran recitation started.",
+        "بدأت تلاوة القرآن."
+    );
+
+    if (Number(currentSurah.number) !== 1 && Number(currentSurah.number) !== 9) {
+        await playAudio("https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3", runId);
+    }
+
+    for (let i = 0; i < currentSurah.ayahs.length; i++) {
+        if (runId !== playbackRunId) return;
+
+        currentAyahIndex = i;
+        highlightAyah(i);
+
+        quranStatus.textContent = selectedLanguage === "ur"
+            ? `آیت ${i + 1} چل رہی ہے`
+            : selectedLanguage === "ar"
+            ? `تشغيل الآية ${i + 1}`
+            : `Playing Ayah ${i + 1}`;
+
+        await playAudio(
+            `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${currentSurah.ayahs[i].number}.mp3`,
+            runId
+        );
+    }
+
+    if (runId === playbackRunId) {
+        quranStatus.textContent = teacherText(
+            "قرآن کی تلاوت مکمل ہو گئی۔",
+            "Quran recitation completed.",
+            "اكتملت تلاوة القرآن."
+        );
+    }
+}
+
+function highlightAyah(index) {
+    document.querySelectorAll(".ayah-card").forEach(card => card.classList.remove("active"));
+    const card = $(`ayah-${index}`);
+    if (card) {
+        card.classList.add("active");
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+}
+
+$("listenBtn").addEventListener("click", playSurah);
+
+/* STOP QURAN AUDIO ONLY */
+function stopQuranAudio(updateStatus = true) {
+    playbackRunId++;
+
+    if (window.currentQuranAudio) {
+        try {
+            window.currentQuranAudio.pause();
+            window.currentQuranAudio.currentTime = 0;
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+
+    document.querySelectorAll(".ayah-card").forEach(card => card.classList.remove("active"));
+
+    if (updateStatus) {
+        quranStatus.textContent = teacherText(
+            "آڈیو روک دی گئی۔",
+            "Audio stopped.",
+            "تم إيقاف الصوت."
+        );
+    }
+}
+
+$("stopBtn").addEventListener("click", () => stopQuranAudio(true));
+
+/* TABS */
+document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        if (button.dataset.tab === "tafseerTab") {
+            openTafseerPage();
+            return;
+        }
+
+        $("tafseerPage").classList.remove("active");
+        $("learningPage").classList.remove("hidden");
+        $("backToLearningBtn").classList.add("hidden");
+
+        document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        const tab = $(button.dataset.tab);
+        if (tab) tab.classList.add("active");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+});
+
+/* ===========================
+   AI CHAT: TEXT + VOICE INPUT
+   AI OUTPUT IS TEXT ONLY
+=========================== */
+
+function setChatStatus(message) {
+    $("chatStatus").textContent = message;
+}
+
+function getChatRoleName(role) {
+    if (role === "user") {
+        return selectedLanguage === "ur" ? "آپ" : selectedLanguage === "ar" ? "أنت" : "You";
+    }
+    return selectedLanguage === "ur" ? "قرآن اے آئی استاد" : selectedLanguage === "ar" ? "معلم القرآن الذكي" : "Quran AI Teacher";
+}
+
+function addChatMessage(role, text) {
+    const empty = $("chatEmpty");
+    if (empty) empty.remove();
+
+    const message = document.createElement("div");
+    message.className = `chat-message ${role}`;
+
+    const label = document.createElement("span");
+    label.className = "chat-role";
+    label.textContent = getChatRoleName(role);
+
+    const content = document.createElement("div");
+    content.textContent = text;
+    content.dir = "auto";
+
+    message.append(label, content);
+    $("chatMessages").appendChild(message);
+    $("chatMessages").scrollTop = $("chatMessages").scrollHeight;
+    return message;
+}
+
+function showChatEmpty() {
+    $("chatMessages").innerHTML = "";
+    const empty = document.createElement("div");
+    empty.className = "chat-empty";
+    empty.id = "chatEmpty";
+    empty.textContent = selectedLanguage === "ur"
+        ? "السلام علیکم! قرآن، ترجمے یا تفسیر کے بارے میں سوال پوچھیں۔"
+        : selectedLanguage === "ar"
+        ? "السلام عليكم! اسأل عن القرآن أو الترجمة أو التفسير."
+        : "Assalam-o-Alaikum! Ask a question about the Quran, translation, or Tafseer.";
+    $("chatMessages").appendChild(empty);
+}
+
+function showChatError(message) {
+    addChatMessage("system", message);
+}
+
+/*
+ Handles common webhook response formats:
+ { answer: "..." }
+ { success: true, answer: "..." }
+ { output: "..." }
+ { text: "..." }
+ { data: { answer: "..." } }
+*/
+function extractAIAnswer(data) {
+    if (typeof data === "string") return data;
+
+    if (Array.isArray(data)) {
+        for (const item of data) {
+            const answer = extractAIAnswer(item);
+            if (answer) return answer;
+        }
+        return "";
+    }
+
+    if (!data || typeof data !== "object") return "";
+
+    const directKeys = ["answer", "output", "response", "text", "message", "reply"];
+    for (const key of directKeys) {
+        if (typeof data[key] === "string" && data[key].trim()) return data[key].trim();
+    }
+
+    if (data.data) {
+        const nested = extractAIAnswer(data.data);
+        if (nested) return nested;
+    }
+
+    if (data.result) {
+        const nested = extractAIAnswer(data.result);
+        if (nested) return nested;
+    }
+
+    if (data.success === false) {
+        return data.error || data.message || "";
+    }
+
+    return "";
+}
+
+/* BUILD CONTEXT FROM THE CURRENTLY LOADED QURAN DATA */
+function buildRelevantQuranContext(question) {
+    const context = [];
+    const q = String(question || "").toLowerCase();
+
+    if (currentSurah && Array.isArray(currentSurah.ayahs)) {
+        const relevantSurahName = [
+            currentSurah.name,
+            currentSurah.englishName,
+            currentSurah.englishNameTranslation
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        const questionMentionsSurah = relevantSurahName && q.includes(relevantSurahName);
+
+        if (questionMentionsSurah || /ayah|verse|آیت|آية|سورہ|سورة|surah|quran|قرآن|القرآن|translation|ترجمہ|تفسير|tafseer|tafsir/i.test(question)) {
+            const ayahs = currentSurah.ayahs.slice(0, 12);
+
+            ayahs.forEach((ayah, index) => {
+                const translation = currentTranslation[index]?.text || "";
+                context.push({
+                    surah: currentSurah.englishName || currentSurah.name,
+                    surahNumber: currentSurah.number,
+                    ayahNumber: index + 1,
+                    arabic: ayah.text || "",
+                    translation
+                });
+            });
+        }
+    }
+
+    const tafseerKey = currentSurah ? `${currentSurah.number}-${selectedLanguage}` : "";
+    if (tafseerKey && tafseerCache.has(tafseerKey)) {
+        const cached = tafseerCache.get(tafseerKey);
+        const items = extractTafseerItems(cached.data);
+
+        items.slice(0, 8).forEach((item, index) => {
+            const text = extractTafseerText(item);
+            if (!text) return;
+
+            context.push({
+                type: "tafseer",
+                surah: currentSurah?.englishName || currentSurah?.name || "",
+                ayahNumber: extractAyahNumber(item, index + 1),
+                tafsir: String(text).replace(/<[^>]*>/g, " ").slice(0, 1200),
+                source: cached.sourceId || "Tafseer"
+            });
+        });
+    }
+
+    return context;
+}
+
+/* SEND QUESTION TO THE N8N WEBHOOK */
+async function sendChatMessage(overrideQuestion = "") {
+    if (isSendingMessage) return;
+
+    const input = $("chatInput");
+    const question = String(overrideQuestion || input.value || "").trim();
+
+    if (!question) {
+        setChatStatus(selectedLanguage === "ur"
+            ? "براہِ کرم اپنا سوال لکھیں یا بولیں۔"
+            : selectedLanguage === "ar"
+            ? "يرجى كتابة السؤال أو التحدث."
+            : "Please type or speak your question.");
+        input.focus();
+        return;
+    }
+
+    input.value = "";
+    isSendingMessage = true;
+    $("sendChatBtn").disabled = true;
+    $("micBtn").disabled = true;
+
+    addChatMessage("user", question);
+    chatHistory.push({ role: "user", content: question });
+
+    setChatStatus(selectedLanguage === "ur"
+        ? "جواب تیار کیا جا رہا ہے..."
+        : selectedLanguage === "ar"
+        ? "جارٍ إعداد الإجابة..."
+        : "Preparing your answer...");
+
+    try {
+        const payload = {
+            question,
+            language: selectedLanguage,
+            inputMode: overrideQuestion ? "voice" : "text",
+            conversationId,
+            history: chatHistory.slice(0, -1),
+            relevantContext: buildRelevantQuranContext(question)
+        };
+
+        const response = await fetch(AI_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const raw = await response.text();
+        let data;
+
+        try {
+            data = raw ? JSON.parse(raw) : {};
+        } catch {
+            data = raw;
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                (typeof data === "object" && data && (data.error || data.message))
+                    ? (data.error || data.message)
+                    : `Webhook request failed (HTTP ${response.status})`
+            );
+        }
+
+        const answer = extractAIAnswer(data);
+
+        if (!answer) {
+            throw new Error(selectedLanguage === "ur"
+                ? "Webhook سے جواب نہیں ملا۔ n8n workflow کا response format چیک کریں۔"
+                : selectedLanguage === "ar"
+                ? "لم يتم استلام إجابة من Webhook. تحقق من إعدادات n8n."
+                : "No answer was returned by the webhook. Check the n8n workflow response.");
+        }
+
+        addChatMessage("ai", answer);
+        chatHistory.push({ role: "assistant", content: answer });
+
+        setChatStatus(selectedLanguage === "ur"
+            ? "جواب موصول ہو گیا۔"
+            : selectedLanguage === "ar"
+            ? "تم استلام الإجابة."
+            : "Answer received.");
+    } catch (error) {
+        console.error("Quran AI chat error:", error);
+        showChatError(error.message || "Unable to connect to the AI teacher.");
+        setChatStatus(selectedLanguage === "ur"
+            ? "کنکشن میں مسئلہ ہے۔ n8n webhook اور workflow چیک کریں۔"
+            : selectedLanguage === "ar"
+            ? "حدثت مشكلة في الاتصال. تحقق من Webhook وسير العمل في n8n."
+            : "Connection problem. Check the n8n webhook and workflow.");
+    } finally {
+        isSendingMessage = false;
+        $("sendChatBtn").disabled = false;
+        $("micBtn").disabled = false;
+        input.focus();
+    }
+}
+
+/* VOICE INPUT — SPEECH IS TRANSCRIBED INTO TEXT */
+function getSpeechLanguage() {
+    if (selectedLanguage === "ur") return "ur-PK";
+    if (selectedLanguage === "ar") return "ar-SA";
+    return "en-US";
+}
+
+function stopSpeechRecognition() {
+    if (speechRecognition) {
+        try {
+            speechRecognition.stop();
+        } catch (error) {
+            console.warn(error);
+        }
+    }
+
+    isListening = false;
+    $("micBtn").classList.remove("listening");
+    updateLanguageUI();
+}
+
+function startSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        setChatStatus(selectedLanguage === "ur"
+            ? "آپ کے براؤزر میں voice recognition دستیاب نہیں۔ Chrome استعمال کریں۔"
+            : selectedLanguage === "ar"
+            ? "التعرف على الصوت غير متاح في متصفحك. جرّب Chrome."
+            : "Speech recognition is not supported in this browser. Try Chrome.");
+        return;
+    }
+
+    if (isListening) {
+        stopSpeechRecognition();
+        return;
+    }
+
+    speechRecognition = new SpeechRecognition();
+    speechRecognition.lang = getSpeechLanguage();
+    speechRecognition.continuous = false;
+    speechRecognition.interimResults = true;
+    speechRecognition.maxAlternatives = 1;
+
+    let finalTranscript = "";
+
+    speechRecognition.onstart = () => {
+        isListening = true;
+        $("micBtn").classList.add("listening");
+        updateLanguageUI();
+        setChatStatus(selectedLanguage === "ur"
+            ? "سن رہا ہوں، اب بولیں..."
+            : selectedLanguage === "ar"
+            ? "أستمع الآن، تفضل بالتحدث..."
+            : "Listening. Speak now...");
+    };
+
+    speechRecognition.onresult = event => {
+        let interimTranscript = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+
+        $("chatInput").value = (finalTranscript + " " + interimTranscript).trim();
+    };
+
+    speechRecognition.onerror = event => {
+        console.error("Speech recognition error:", event.error);
+
+        const errorMessages = {
+            "not-allowed": "Microphone permission was denied. Allow microphone access in your browser.",
+            "no-speech": "No speech detected. Please try again.",
+            "audio-capture": "No microphone was detected.",
+            "network": "Speech recognition network error. Check your internet connection."
+        };
+
+        setChatStatus(errorMessages[event.error] || `Speech recognition error: ${event.error}`);
+    };
+
+    speechRecognition.onend = () => {
+        isListening = false;
+        $("micBtn").classList.remove("listening");
+        updateLanguageUI();
+
+        if ($("chatInput").value.trim()) {
+            setChatStatus(selectedLanguage === "ur"
+                ? "آپ کی آواز متن میں تبدیل ہو گئی ہے۔ جواب حاصل کرنے کے لیے بھیجیں دبائیں۔"
+                : selectedLanguage === "ar"
+                ? "تم تحويل الصوت إلى نص. اضغط إرسال للحصول على الإجابة."
+                : "Speech converted to text. Press Send to get an answer.");
+        }
+    };
+
+    try {
+        speechRecognition.start();
+    } catch (error) {
+        console.error(error);
+        setChatStatus("Unable to start speech recognition. Please try again.");
+    }
+}
+
+/* CHAT BUTTONS */
+$("sendChatBtn").addEventListener("click", () => sendChatMessage());
+
+$("chatInput").addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+    }
+});
+
+$("micBtn").addEventListener("click", startSpeechRecognition);
+
+$("clearChatBtn").addEventListener("click", () => {
+    if (isListening) stopSpeechRecognition();
+
+    chatHistory = [];
+    conversationId = makeConversationId();
+    $("chatInput").value = "";
+    setChatStatus("");
+    showChatEmpty();
+});
+
+/* START PAGE */
+updateLanguageUI();
+loadSurahs();
+</script>
+</body>
+</html>
